@@ -1,0 +1,16 @@
+[user]
+	name = Default Username
+	email = Default email
+
+[url "git@bitbucket.org:"]
+	insteadOf = https://bitbucket.org/
+
+
+[includeIf "gitdir:~/projects/github/"]
+    path = ~/projects/github/.gitconfig
+
+[includeIf "gitdir:~/projects/bitbucket/"]
+    path = ~/projects/bitbucket/.gitconfig
+
+[includeIf "gitdir:~/projects/gitlab/"]
+    path = ~/projects/gitlab/.gitconfig
