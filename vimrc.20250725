@@ -1,0 +1,100 @@
+" general flags
+syntax on;
+filetype plugin indent on
+
+syntax on;
+filetype plugin indent on
+
+set nocp
+set mouse-=a
+set t_Co=256
+
+set background=dark
+
+" Encoding
+set encoding=UTF-8
+"Highlight matching search patterns
+set hlsearch
+" Enable incremental search
+set incsearch
+" Include matching uppercase words with lowercase search term
+set ignorecase
+" Include only uppercase words with uppercase search term
+set smartcase
+
+" Removes highlightness from the searched word(s)
+nnoremap <return> :noh<return><esc>
+
+" Code folding
+set foldmethod=manual
+
+" my vim config
+set relativenumber
+set number
+set noexpandtab
+set tabstop=4
+set shiftwidth=4
+retab!
+set autoindent
+set smartindent
+set tabstop=4
+set shiftwidth=4
+set expandtab
+
+
+" vim plugins starts
+call plug#begin()
+	" go-lsp
+	Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+
+	" fuzzy finder
+	Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+	Plug 'junegunn/fzf.vim'
+
+	" nerdTree
+	Plug 'preservim/nerdtree'
+
+	" Auto Pairs
+	Plug 'jiangmiao/auto-pairs'
+
+call plug#end()
+" vim plugins ends
+
+" plugins configuration
+
+" FZF configuration
+" Initialize configuration dictionary
+let g:fzf_vim = {}
+let g:fzf_vim.preview_window = ['right,50%', 'ctrl-/']
+let g:fzf_vim.listproc = { list -> fzf#vim#listproc#location(list) }
+
+" Open fzf window by pressing space key two times
+nnoremap <silent> <space><space> :Files<CR>
+nnoremap <silent> <space>g :Rg<CR>
+command! -bang -nargs=* Rg call fzf#vim#grep("rg --column --line-number --no-heading --color=always ".shellescape(<q-args>), 1, <bang>0)
+
+" NERDTree configuration
+" Open nerd tree at the current file or close nerd tree if pressed again.
+nnoremap <silent> <expr> <space>e g:NERDTree.IsOpen() ? "\:NERDTreeClose<CR>" : bufexists(expand('%')) ? "\:NERDTreeFind<CR>" : "\:NERDTree<CR>"
+" opens NERDTree on vim opening
+" autocmd VimEnter * NERDTree
+
+" On save execute the GoErrCheck function
+autocmd BufWritePost *.go GoVet
+
+" Enable gopls for vim-go
+let g:go_def_mode = 'gopls'
+let g:go_info_mode = 'gopls'
+let g:go_code_completion_enabled = 1  " Enable completions
+set completeopt+=preview
+autocmd FileType go set splitbelow	" Preview opens below instead of below
+autocmd FileType go inoremap . .<C-x><C-o><C-p>
+autocmd InsertLeave *.go silent! pclose
+
+" jump into buffer files
+nnoremap H :bprevious<CR>
+nnoremap L :bnext<CR>
+
+" Enhanced yy mapping (works for multiline)
+nnoremap yy :call setreg('*', getreg('"'))<bar>call setreg('+', getreg('"'))<CR>yy
+vnoremap y :<C-u>let @*=@"<bar>let @+=@"<CR>gvy
