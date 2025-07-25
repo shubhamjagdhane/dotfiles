@@ -57,6 +57,11 @@ call plug#begin()
 	" Auto Pairs
 	Plug 'jiangmiao/auto-pairs'
 
+    " asynchronous lint engine
+    Plug 'dense-analysis/ale'
+
+    " html emmet
+    Plug 'mattn/emmet-vim'
 call plug#end()
 " vim plugins ends
 
@@ -80,16 +85,22 @@ nnoremap <silent> <expr> <space>e g:NERDTree.IsOpen() ? "\:NERDTreeClose<CR>" : 
 " autocmd VimEnter * NERDTree
 
 " On save execute the GoErrCheck function
-autocmd BufWritePost *.go GoVet
+" autocmd BufWritePost *.go GoVet
 
 " Enable gopls for vim-go
 let g:go_def_mode = 'gopls'
 let g:go_info_mode = 'gopls'
 let g:go_code_completion_enabled = 1  " Enable completions
+" vim-go + gopls settings
+let g:go_diagnostics_enabled = 1           " Enable real-time diagnostics
+let g:go_highlight_diagnostic_errors = 1   " Highlight errors
+let g:go_highlight_diagnostic_warnings = 1 " Highlight warnings
 set completeopt+=preview
 autocmd FileType go set splitbelow	" Preview opens below instead of below
 autocmd FileType go inoremap . .<C-x><C-o><C-p>
 autocmd InsertLeave *.go silent! pclose
+
+autocmd FileType go set culopt+=number                 " Show line number highlight
 
 " jump into buffer files
 nnoremap H :bprevious<CR>
@@ -98,3 +109,46 @@ nnoremap L :bnext<CR>
 " Enhanced yy mapping (works for multiline)
 nnoremap yy :call setreg('*', getreg('"'))<bar>call setreg('+', getreg('"'))<CR>yy
 vnoremap y :<C-u>let @*=@"<bar>let @+=@"<CR>gvy
+
+" javascript or typescript
+
+" Linters for HTML/CSS/JS
+let g:ale_linters = {
+\   'html': ['htmlhint'],
+\   'css': ['stylelint'],
+\   'javascript': ['eslint', 'tsserver'],
+\   'javascriptreact': ['eslint', 'tsserver'],
+\   'typescriptreact': ['eslint', 'tsserver'],
+\}
+
+" Fixers
+let g:ale_fixers = {
+\   'html': ['prettier'],
+\   'css': ['prettier','stylelint'],
+\   'javascript': ['prettier', 'eslint'],
+\   'javascriptreact': ['prettier', 'eslint'],
+\   'typescriptreact': ['eslint', 'tsserver'],
+\}
+
+autocmd BufNewFile,BufRead *.js,*.jsx,*.ts,*.tsx set filetype=javascriptreact
+autocmd BufNewFile,BufRead *.css set filetype=css
+
+let g:ale_fix_on_save = 1  " Critical: Enable auto-fix on save
+let g:ale_linters_explicit = 1  " Only run configured linters
+let g:ale_javascript_prettier_options = '--tab-width 4 --use-tabs false'
+
+" Show errors in gutter (left sign column) and hover
+let g:ale_sign_error = '✗'
+let g:ale_sign_warning = '⚠'
+let g:ale_set_highlights = 1
+
+" Show error messages next to the line
+let g:ale_echo_msg_error_str = 'E'
+let g:ale_echo_msg_warning_str = 'W'
+let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+
+let g:ale_open_log = 1           " Auto-open log on error
+
+" Highlight problematic lines
+highlight ALEErrorLine ctermbg=DarkRed guibg=#4a1a1a
+highlight ALEWarningLine ctermbg=DarkYellow guibg=#4a3a1a
